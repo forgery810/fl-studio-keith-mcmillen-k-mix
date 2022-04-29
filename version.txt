@@ -1,0 +1,2 @@
+0.10 - transport and master vol controls added
+0.12 - window focusing and up/down/enter added

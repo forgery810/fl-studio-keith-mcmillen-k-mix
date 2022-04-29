@@ -1,20 +1,47 @@
-#144 / 128
-master_button = 9
-preset = 13
-record = 26
-stop = 27
-back = 28
-play = 29 
 
-#176
-master_vol = 30
-eight_vol = 29
-seven_vol = 28
-six_vol = 27
-five_vol = 26
-four_vol = 25
-three_vol = 24
-two_vol = 23
-one_vol = 22
+class Button:				#144 / 128
+
+	master = 9
+	preset = 13
+	record = 26
+	stop = 27
+	back = 28
+	play = 29
+	byps = 10
+	fine = 11
+	vu = 12
+	preset = 13
+	main = 14
+	aux1 = 15
+	aux2 = 16
+	aux3 = 17
+	comp = 18
+	gate = 19
+	pan = 2 
+	eq  = 21
+	verb = 22
+	trim = 23
+	volts = 24
+	headphone = 25
+
+class Knob:							# 176
+
+	kone = 10
+	ktwo = 11
+	kthree = 12
+	kfour = 13
+ 
+
+class Fader:							# 176
+
+	master =  30
+	eight =  29
+	seven =  28
+	six =  27
+	five =  26
+	four =  25
+	three =  24
+	two =  23
+	one = 22
 
  
