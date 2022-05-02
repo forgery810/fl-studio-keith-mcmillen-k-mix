@@ -2,14 +2,13 @@
  A Python MIDI script to intergrate the Keith McMillen K-Mix with FL Studio.
 
 
- # Installation 
+# Installation 
 
 Update to the latest version of FL Studio.
 
 Clone and Unzip the folder to Documents/Image-Line/Fl Studio/Settings/Hardware
 
- In Fl Studio, go to options/MIDI settings and enable Control Surface. Disable Audio Control and Expander. Set Contoller Type to Keith McMillen K-Mix found in the upper right corner of the window. 
-
+ In Fl Studio, go to options/MIDI settings and enable Control Surface under Input and Output and set the Ports of each to 3. Disable Audio Control and Expander. Set Contoller Type to Keith McMillen K-Mix found in the upper right corner of the window. 
 
 # Manual
 
@@ -27,7 +26,10 @@ Fine - Up
 VU - Down
 Byps - Enter
 
-Master Fader - Controls Master Track Volume
+Master Button - Alternates between options for master fader
+
+Master Fader - Controls master track volume (red LED lit) or 
+               Scrolls through channels
 
 
 
