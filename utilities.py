@@ -10,7 +10,6 @@ def mapvalues(value, tomin, tomax, frommin, frommax):
 class Send():
 
 	def midi_msg(midi_id, chan, cc, data):
-		print('sent')
 		device.midiOutMsg(midi_id, chan, cc, data)
 
 

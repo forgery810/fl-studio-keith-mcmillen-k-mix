@@ -31,6 +31,8 @@ Master Button - Alternates between options for master fader
 Master Fader - Controls master track volume (red LED lit) or 
                Scrolls through channels
 
+Knob One - Controls volume for selected track or channel
+Knob Two - Controls panning for selected track or channel
 
 
 

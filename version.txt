@@ -2,3 +2,6 @@
 0.12 - window focusing and up/down/enter added
 0.15 - master fader can now scroll through tracks/channels
        transport leds now reflect play/rec/stop status
+0.16 - window leds refelct current state
+     - knob 1 and 2 control volume/panning for currently selected track/channel
+     - in mixer, window now scrolls with track selection

@@ -30,6 +30,8 @@ class Knob:							# 176
 	ktwo = 11
 	kthree = 12
 	kfour = 13
+
+	knob_numbers = [kone, ktwo, kthree, kfour]
  
 
 class Fader:							# 176
@@ -43,5 +45,7 @@ class Fader:							# 176
 	three =  24
 	two =  23
 	one = 22
+
+	fader_numbers = [master, eight, seven, six, five, four, three, two, one]
 
  
