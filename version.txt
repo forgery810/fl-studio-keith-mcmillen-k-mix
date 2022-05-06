@@ -5,3 +5,6 @@
 0.16 - window leds refelct current state
      - knob 1 and 2 control volume/panning for currently selected track/channel
      - in mixer, window now scrolls with track selection
+0.17 - faders now control volume for first 8 tracks when mixer is focused
+     - faders now reflect current track volume
+     - buttons 1-8 now select tracks 1-8

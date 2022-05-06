@@ -1,6 +1,8 @@
 
 class Button:				#144 / 128
 
+
+
 	master = 9
 	preset = 13
 	record = 26
@@ -23,6 +25,17 @@ class Button:				#144 / 128
 	trim = 23
 	volts = 24
 	headphone = 25
+	one = 1
+	two = 2
+	three = 3
+	four = 4
+	five =5 
+	six = 6
+	seven = 7
+	eight = 8
+
+	numbers = [one, two, three, four, five, six, seven, eight]
+
 
 class Knob:							# 176
 

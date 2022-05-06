@@ -15,6 +15,7 @@ import general
 from midi import *
 import midi
 from acquire import Get
+from acts import TrAct, MixAct, UIAct, ChanAct 
 
 mode = Modes()
 lights = Led()
@@ -33,7 +34,6 @@ def OnRefresh(flag):
 	print(flag)
 	if flag:
 		lights.update()	
-
 
 def OnIdle():
 	pass
@@ -101,6 +101,16 @@ class KM:
 		elif self.event.data1 == Button.master:
 			mode.change_mode('master')
 
+		if Get.mixer_focused():
+
+			if self.event.data1 in Button.numbers:
+				MixAct.set_track(Button.numbers.index(self.event.data1) + 1)
+
+			else:
+				pass
+
+
+
 		self.event.handled = True
 
 	def faders(self):
@@ -112,12 +122,17 @@ class KM:
 					ui.scrollWindow(0, self.track)
 				elif Get.channels_focused():
 					print('channels focus')
-					channels.selectOneChannel(int(round(mapvalues(self.event.data2, channels.channelCount()-1, 0, 0, 127), 0)))		
+					channels.selectOneChannel(int(round(mapvalues(self.event.data2, channels.channelCount()-1, 0, 0, 127), 0)))	
+				self.handled = True	
 			else:					
 				MixAct.track_volume(0, self.event.data2/127)
 
-		self.event.handled = True
+				self.event.handled = True
 
+		if Get.mixer_focused() and self.event.data1 != Fader.master:
+			MixAct.track_volume(self.event.data1 - 21, self.event.data2 / 127)
+
+		self.event.handled = True
 
 	def knobs(self):
 
@@ -135,65 +150,3 @@ class KM:
 			elif self.event.data1 == Knob.ktwo:
 				MixAct.track_panning(self.track, mapvalues(self.event.data2, -1, 1, 0, 127), 2)
 		self.event.handled = True
-
-class TrAct:
-
-	def start():
-		transport.start()	
-
-	def stop():
-		transport.stop()
-
-	def setPosition(position = 0):
-		transport.setSongPos(position)
-
-	def record():
-		transport.record()
-
-class MixAct:
-
-	def set_track(track_num):
-		mixer.setTrackNumber(track_num)
-
-	def track_volume(track_num, value, pickupMode = 2):
-		mixer.setTrackVolume(track_num, value, pickupMode)
-
-	def track_panning(track_num, value, pickupMode = 2):
-		mixer.setTrackPan(track_num, value, pickupMode)
-
-	def mute_track(track_num):
-		mixer.muteTrack(track_num)
-
-class UIAct:
-
-	window_constants = ["mixer", "channels", "playlist", "piano", "browser"]
-
-	def up():
-		ui.up()
-
-	def down():
-		ui.down()
-
-	def left():
-		ui.left()
-
-	def right():
-		ui.right()
-
-	def enter():
-		ui.enter()
-
-	def message(message):
-		ui.setHintMsg(message)
-
-	def focus(window_index):
-		ui.showWindow(UIAct.window_constants.index(window_index))
-	
-class ChanAct:
-
-	def channel_volume(channel, volume, pickup):
-		channels.setChannelVolume(channel, volume, pickup)
-
-	def channel_panning(channel, pan, pickup):
-		channels.setChannelPan(channel, pan, pickup)
-

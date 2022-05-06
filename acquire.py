@@ -24,11 +24,17 @@ class Get:
 	def mixer_focused():
 		return ui.getFocused(0)
 
+	def track_volume(track, mode):
+		return mixer.getTrackVolume(track, mode)
+
 	def current_track():
 		return mixer.trackNumber()
 
 	def channels_focused():
 		return ui.getFocused(1)
+
+	def trig_bit(channel, step):
+		return channels.getGridBit(channel, step)
 
 	def current_channel():
 		return channels.channelNumber()
@@ -38,7 +44,7 @@ class Get:
 
 	def pattern_trigs(pattern):
 		trigs = []
-		for step in range(0, pattern_length(pattern)):
-			trigs.append(step)
+		for step in range(0, Get.pattern_length(pattern)):
+			trigs.append(Get.trig_bit(pattern, step))
 		print(trigs)
 

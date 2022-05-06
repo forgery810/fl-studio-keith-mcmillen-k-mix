@@ -1,6 +1,7 @@
 # fl-studio-keith-mcmillen-k-mix
  A Python MIDI script to intergrate the Keith McMillen K-Mix with FL Studio.
 
+ See version.txt for update information
 
 # Installation 
 
@@ -27,9 +28,11 @@ VU - Down
 Byps - Enter
 
 Master Button - Alternates between options for master fader
+1-8 Buttons - Select mixer tracks
 
 Master Fader - Controls master track volume (red LED lit) or 
                Scrolls through channels
+1-8 Faders - Control mixer track volume for tracks 1-8
 
 Knob One - Controls volume for selected track or channel
 Knob Two - Controls panning for selected track or channel
