@@ -1,31 +1,49 @@
 import device
 from data import *
 from utilities import Send
+from acquire import Get
 
-class Modes():
+# class Modes():
 
-	modes = {
-			'master': {
-						'index': 0,
-						'options': ['Master Volume', 'Scroll'],
-						'led': [127, 0],
-						'midi_num': [144, 0, 9]
-						},
-			}
 
-	def change_mode(self, mode_name):
 
-		m = Modes.modes[mode_name]
-		m['index'] += 1
-		if m['index'] >= len(m['options']):
-			m['index'] = 0
-		# Send.midi_msg(m['midi_num'][0], m['midi_num'][1], m['midi_num'][2], m['led'][m['index']])
+class Modes:
 
-		# device.midiOutMsg(144, 0, Modes.modes[mode_name]['midi_num'], Modes.modes[mode_name]['led'][Modes.modes[mode_name]['index']])
+	def __init__(self, name, categories):
+		self.name = name
+		self.iter = 0
+		self.categories = categories
+		self.ranges = [range(1, 9), range(9, 17), range(17, 25), range(25, 33) ]
+	
 
-	@staticmethod
-	def get_mode_option(mode_name):
-		return Modes.modes[mode_name]['index']
+	def iterate(self):
+		self.iter += 1
+		if self.iter >= self.get_cat_len():
+			self.iter = 0
+
+	def get_cat_len(self):
+		return len(self.categories)
+
+	def get_current_mode_name(self):
+		return self.categories[self.iter]
+
+	def set_range(self, cc):
+		if cc in range(0, 31):
+			self.iter = 0
+		elif cc in range(32, 63):
+			self.iter = 1
+		elif cc in range(63, 95):
+			self.iter = 2
+		elif cc in range(95, 127):
+			self.iter = 3
+
+	def update_iter(self, num):
+		print(Get.current_track())
+		for r in self.ranges:
+			if num in r:
+				self.iter = self.ranges.index(r)
+				print(r)
+
 
 
 

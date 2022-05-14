@@ -8,3 +8,8 @@
 0.17 - faders now control volume for first 8 tracks when mixer is focused
      - faders now reflect current track volume
      - buttons 1-8 now select tracks 1-8
+0.20 - mixer tracks 1-32 can now be controlled by faders
+       using knob 4 to access 4 pages of faders
+     - knob 2 reflects panning for currently selected track/channel
+     - metronome, overdub, loop recording can be toggled by 
+       F, G, and H Button respectively

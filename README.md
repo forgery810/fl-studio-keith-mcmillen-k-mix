@@ -17,11 +17,14 @@ Record, play, and stop buttons work as expected.
 
 Other button functionality:
 
-Main - Opens Channel Rack
-Aux1 - Opens Mixer
-Aux2 - Opens Piano Roll
-Aux3 - Opens Playlist
-Comp - Opens Broswer
+A - Opens Channel Rack
+B - Opens Mixer
+C - Opens Piano Roll
+D - Opens Playlist
+E - Opens Broswer
+F - Metronome
+G - Overdub
+H - Loop
 
 Fine - Up
 VU - Down
@@ -36,6 +39,9 @@ Master Fader - Controls master track volume (red LED lit) or
 
 Knob One - Controls volume for selected track or channel
 Knob Two - Controls panning for selected track or channel
+
+Knob Four - Selects range for faders. Four ranges to access
+            control of 32 tracks total.
 
 
 

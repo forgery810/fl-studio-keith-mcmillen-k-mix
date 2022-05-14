@@ -1,0 +1,1127 @@
+Script Events
+	Name	    		Arguments	Documentation									Version
+	OnInit	-						Called when the script has been started.	1
+	OnDeInit						Called before the script will be stopped.	1
+	OnMidiIn			eventData	Called first when a MIDI message is received. Set the event's handled property to True if you don't want further 
+									processing - (only raw data is included here: handled, timestamp, status, data1, data2, port, sysex, pmeflags)
+									use this event for filtering, use OnMidiMsg event for actual processing ...	1
+	OnMidiMsg			eventData	Called for all MIDI messages that were not handled by OnMidiIn.	1
+	OnSysEx				eventData	Called for note sysex messages that were not handled by OnMidiIn.	1
+	OnNoteOn			eventData	Called for note on messages that were not handled by OnMidiMsg.	1
+	OnNoteOff			eventData	Called for note off messages that were not handled by OnMidiMsg.	1
+	OnControlChange		eventData	Called for CC messages that were not handled by OnMidiMsg.	1
+	OnProgramChange		eventData	Called for program change messages that were not handled by OnMidiMsg.	1
+	OnPitchBend			eventData	Called for pitch bend change messages that were not handled by OnMidiMsg.	1
+	OnKeyPressure		eventData	Called for key pressure messages that were not handled by OnMidiMsg.	1
+	OnChannelPressure	eventData	Called for channel pressure messages that were not handled by OnMidiMsg.	1
+	OnMidiOutMsg		eventData	Called for short MIDI out messages sent from MIDI Out plugin - (event properties are limited to: handled, 										status,   data1, data2, port, midiId, midiChan, midiChanEx)	1
+	OnIdle	-						Called from time to time. Can be used to do some small tasks, mostly UI related. For example: update activity 									meters.	1
+	OnProjectLoad		long status	Called when project is loaded	16
+	OnRefresh			long flags	Called when something changed that the script might want to respond to.	1
+	OnDoFullRefresh	-				Same as OnRefresh, but everything should be updated.	1
+	OnUpdateBeatIndicator	long value	Called when the beat indicator has changes - "value" can be off = 0, bar = 1 (on), beat = 2 (on)	1
+	OnDisplayZone	-				Called when playlist zone changed	1
+	OnUpdateLiveMode	long lastTrack	Called when something about performance mode has changed.	1
+	OnDirtyMixerTrack	long index	Called on mixer track(s) change, 'index' indicates track index of track that changed or -1 when all tracks changed
+									collect info about 'dirty' tracks here but do not handle track(s) refresh, wait for OnRefresh event with HW_Dirty_Mixer_Controls flag	1
+	OnDirtyChannel		long index 
+						long flag	
+									Called on channel rack channel(s) change, 'index' indicates channel that changed or -1 when all channels changed
+									collect info about 'dirty' channels here but do not handle channels(s) refresh, wait for OnRefresh event with HW_ChannelEvent flag	16
+	OnFirstConnect	-				Called when device is connected for the first time (ever)	17
+	OnUpdateMeters	-				Called when peak meters needs to be updated
+									call device.setHasMeters() in onInit to use this event!	1
+	OnWaitingForInput	-			Called when FL Studio is set in waiting mode	1
+	OnSendTempMsg		string message, 
+						long duration	
+									Called when hint message (to be displayed on controller display) is sent to the controller
+									duration of message is in ms	1
+
+Playlist module
+
+	Command					Arguments			Result					Documentation				Version
+
+	trackCount()			long				Returns the current track count.				1
+	getTrackName()			long index	
+							string				Returns the name of the track at "index".		1
+	setTrackName()			long index, 
+							string name	-		Changes the name of the track at "index" to "name".	1
+	getTrackColor()			long index	
+							long				Returns the color of the track at "index" as an RGBA value.	1
+	setTrackColor()			long index, 
+							long color	-		Changes the color of the track at "index" to the value of "color".	1
+	isTrackMuted()			long index	
+							long				Returns True if the track at "index" is muted.	1
+	muteTrack()				long index	-		Toggles the Mute status of the track at "index".	1
+	isTrackMuteLock()		long index	
+							long				Returns True if the Mute for track at "index" is locked.	2
+	muteTrackLock()			long index	-		Toggles the Mute lock status of the track at "index".	2
+	isTrackSolo()				long index	long	Returns True if the track at "index" is currently solo'd.	1
+	soloTrack()				long index, 
+							(long value = -1)	without value this function will toggle the solo state of the 									track at "index" - set optional 'value' to 1 to solo track or to 0 								unsolo track 1
+	isTrackSelected	()		long index	long	Returns True if the track at "index" is selected.	12
+	selectTrack()				long index	-		Toggle selection of the track at "index".	12
+	selectAll()	-	-							Select all playlist tracks.	12
+	deselectAll()	-	-							Deselect all playlist tracks.	12
+	getTrackActivityLevel()	long index	
+							float				Returns the activity level of the track at "index" (zero if not active, > 0 if 						active).	1
+	getTrackActivityLevelVis()	long index	
+							float				Returns the visual activity level of the track at "index" as a normalized 												value.	1
+	getDisplayZone()	-		long				Returns current display zone in the playlist or zero if none.	1
+	lockDisplayZone			long index, 
+							long value	-		Lock display zone at "index".	1
+	liveDisplayZone			long left, 
+							long top, 
+							long right, 
+							long bottom, 
+							(long duration = 0)	Set the display zone in the playlist to the specified co-ordinates - use 							optional 'duration' parameter to make display zone temporary	1
+	getLiveLoopMode			long index	
+							long				Get live loop mode.	1
+	getLiveTriggerMode		long index	
+							long				Get live trigger mode - Result is one of the constants	1
+	getLivePosSnap			long index	long	Get live pos snap - Result is one of the constants	1
+	getLiveTrigSnap			long index	long	Get live trig snap - Result is one of the constants	1
+	getLiveStatus			long index, 
+							(long mode = LB_Status_Default)	
+							long	`			Get live status for track at "index" - 								`							Result depends on mode.	1
+	getLiveBlockStatus		long index, 
+							long blockNum, 
+							(long mode = LB_Status_Default)	
+							long				Get live block status for tracks 																at "index" and for block "blockNum"
+												Result depends on mode -	1
+	getLiveBlockColor		long index, 
+							long blockNum	
+							long				Get live block color for track at "index" and for block 																	"blockNum"	1
+	triggerLiveClip			long index, 
+							long subNum, 
+							long flags, 
+							(float velocity = -1)	-	Trigger live clip for track at 																	"index" and for block "blockNum"	1
+	refreshLiveClips	long index, long value	-	Refresh live clips for track at "index".	1
+	incLivePosSnap			long index, 
+							long value	-	Increase live pos snap for track at "index"	1
+	incLiveTrigSnap			long index, 
+						long value	-		Increase live trig snap for track at "index".	1
+	incLiveLoopMode			long index, 
+							long value	-		Increase live loop mode for track at "index"	1
+	incLiveTrigMode			long index, 
+							long value	-		Increase live trig mode for track at "index"	1
+	getVisTimeBar	-		long				Get time bar.	1
+	getVisTimeTick	-		long				Get time tick.	1
+	getVisTimeStep	-		long				Get time step.	1
+
+Channels module:
+
+	'index' is respecting channel groups, 'indexGlobal' is global index
+
+	Command				Arguments					Result			Documentation	Version
+
+	selectedChannel		(long canBeNone = 0), 		Returns 'index' (respecting groups) of the first selected channel
+						(long offset = 0), 			Use optional 'offset' parameter to find other selected channels
+						(long indexGlobal = 0)		Set optional 'indexGlobal' to 1 to return global channel index instead of index 	widChannelRack respecting groups
+						long	
+
+	channelNumber		(long canBeNone = 0), 
+						(long offset = 0)	
+						long						Returns 'indexGlobal' of the first selected channel
+													When there is no selection, function will return -1 (or 0 if canBeNone is 1)
+													Use optional 'offset' parameter to find other selected channels	1
+	
+	channelCount		(long mode* = 0)	
+						long						Returns the number of channels respecting groups - set optional mode* parameter to 1 to 						get count of all channels	1, *3
+	
+	getChannelName		long index	
+						string						Returns the name of the channel at "index".	1
+	
+	setChannelName		long index, 
+						string name	-				Changes the name of the channel at "index" to "name".	1
+	
+	getChannelColor		long index	
+						long						Returns the color of the channel at "index".	1
+	
+	setChannelColor		long index, 
+						long color	-				Changes the color of the channel at "index" to the value of "color".	1
+	
+	isChannelMuted		long index	
+						long						Returns True if the channel at "index" is muted.	1
+	
+	muteChannel			long index	-				Toggles the muted state of the channel at "index".	1
+	
+	isChannelSolo		long index	
+						long						Returns True if the channel at "index" is soloed.	1
+	
+	soloChannel			long index	-				Toggles the solo state of the channel at "index".	1
+	
+	getChannelVolume	long index, 
+						(long mode* = 0)	
+						float						Returns the normalized volume (between 0 and 1.0) of the channel at "index" - set optional mode to 1 to get volume in dB	1, *14
+	
+	setChannelVolume	long index,
+						float volume, 
+						(long pickupMode* = PIM_None)	-	Changes the volume for the channel at "index" - volume is a value between 0 and 1.0
+															use optional pickupMode to override FL default pickup option	1, *13
+	
+	getChannelPan		long index	
+						float						Returns the pan value for the channel at "index", as a value between -1.0 and +1.0.	1
+	
+	setChannelPan		long index, 				Change the pan value of the channel at "index" to the value of "pan" - The value should be between -1.0 and +1.0 - use optional pickupMode to override FL default pickup option	1, 13(pickup)
+						float pan, 
+						(long pickupMode* = PIM_None)	-	
+	
+	getChannelPitch		long index, 
+						(long mode = 0)	
+						float/long					Returns the pitch value for the channel at "index", as a value between -1.0 and +1.0 - use optional mode parameter to return pitch in semitones (mode = 1) or to return pitch range (mode = 2)	8
+	
+	setChannelPitch		long index, 
+						float value, 
+						(long mode = 0), 
+						(long pickupMode* = PIM_None)	-	Change the pitch value of the channel at "index" - The value should be between -1.0 and +1.0 - use optional mode parameter to send value in semitones (mode = 1) or to change pitch range (mode = 2)
+															use optional pickupMode to override FL default pickup option	8, 13*
+	
+	getChannelType		long index	
+						long						Returns the type of channel, can be one of the following values	19
+	
+	isChannelSelected	long index	
+						long						Returns True if the channel at "index" is selected.	1
+	
+	selectOneChannel	long index	-				Select channel at "index" exclusively.	8
+	
+	selectChannel		long index, 
+						(long value = -1)	-		Toggle the selection of the channel at "index" - to not toggle, set value to 1 (select) or 0 (deselect)	1
+	
+	selectAll			-	-						Select all channels in the current channel group.	1
+	
+	deselectAll	-	-								Deselect all channels in the current channel group.	1
+	
+	getChannelMidiInPort	long index	
+						long						Returns MIDI port for channel at "index".	1
+	
+	getChannelIndex		long index	
+						long						Returns 'indexGlobal' for channel at "index" (respecting the groups).	1
+	
+	getTargetFxTrack	long index	
+						long						Returns target FX track for channel at "index".	1
+	
+	isHighLighted	-	long					Returns True when red highlight rectangle is active in channel rack.	1
+	
+
+	Channel events:
+		getRecEventId	long index	long	Returns eventID for channel at "index".
+		Use this eventID in processRECEvent.
+		Example (to get eventId for volume of first channel):
+	
+		eventId = midi.REC_Chan_Vol + channels.getRecEventId(0)	1
+		incEventValue	long eventId, 
+						long step, 
+						double res*	
+						long					Get event value increased by step. Use (optional*) res paremeter to specify increment resolution.
+		Use result as new value in processRECEvent
+		Example (to increase volume of first channel): step = 1
+		eventId = midi.REC_Chan_Vol + channels.getRecEventId(0)
+		newValue = channels.incEventValue(eventId, step)
+		general.processRECEvent(eventId, newValue, midi.REC_UpdateValue | midi.REC_UpdateControl)	1, *20: res is optional, default = 1/24
+		processRECEvent	long eventId, long value, long flags	long	This function is deprecated here and moved to general module. More info here	1, 7(deprecated)
+
+	Channel grid bits:
+
+		getGridBit					long index, long position	long	Returns grid bit at "position" for channel at "index".	1
+		setGridBit					long index, long position, long value	-	Set grid bit value at "position" for channel at "index".	1
+		getStepParam				long step, long param, long ofset, long startPos, (long padsStride = 16)	long	Get step parameter for step at "step"	1
+		getCurrentStepParam			long index, long step, long param	-	Get current step parameter for channel at "index" and for step at "step".	1
+		setStepParameterByIndex		long index, long patNum, long step, long param, long value, (long globalIndex = 0)	-	Set current step parameter for channel at "index" and for step at "step".
+															set optional globalIndex to 1 to use global channel index	1
+		getGridBitWithLoop			long index, long position	-	Get grid bit with loop for channel at "index".	1
+		showGraphEditor				bool temporary, long param, long step, long index, (long globalIndex* = 1)	-	Show graph editor for channel at "index" and for step at "step".
+													set optional globalIndex to 0 to use group channel index
+													set temporary to false to keep editor open	1, *20
+	Misc.
+		showEditor					long index, (long value* = -1)	-	Show editor (plugin window) for channel at "index" - set optional 'value'* to 1 to show or to 0 to hide editor	1, *3
+		focusEditor					long index	-	Focus editor (plugin window) for channel at "index".	1
+		showCSForm					long index, (long state* = 1)	-	Show channel settings (or plugin window for plugins) for channel at "index" - use optional state to 0 (close), 1 (open), -1 (toggle) channel settings window	1, *9
+		midiNoteOn					long indexGlobal, long note, long velocity, (long channel = -1)	-	Set MIDI note for channel at "indexGlobal".	1
+		getActivityLevel			long index	float	Returns activity level for channel at "index".	9
+		quickQuantize				long index, (long startOnly = 1)	float	Perform quick quantize for channel at "index".	9
+
+Mixer module
+
+	Mixer module allows you to control FL Studio Mixer. NOTE: Track number 0 is always the Master.
+	
+	Command	Arguments			Result					Documentation	Version
+
+	trackNumber	-				long					Returns the index of the currently selected mixer track.	1
+	getTrackInfo				long mode	
+								long					Returns track info.	1
+	setTrackNumber				long trackNumber, 
+								(long flags = [])	-	Sets the currently selected mixer track.	1
+	trackCount	-				long					Returns the number of tracks.	1
+	getTrackName				long index, 
+								(long maxLen = -1)	
+								string					Returns the name of the track at "index".	1
+	setTrackName				long index, 
+								string name	-			Changes the name of the track at "index" to "name".	1
+	getTrackColor				long index	
+								long					Returns the color of the track at "index".	1
+	setTrackColor				long index, 
+								long color	-			Changes the color of the track at "index" to "color".	1
+	isTrackArmed				long index	
+								long					Returns True if the track at "index" is armed.	1
+	armTrack					long index	-			Toggle the armed state of the track at "index".	1
+	isTrackSolo					long index	
+								long					Returns True if the track at "index" is soloed.	1
+	soloTrack					long index, 
+								(long value = -1), 
+								(long mode = [])	-	without value this function will toggle the solo state of 	the track at "index" - set optional 'value' to 1 to solo track or to 0 unsolo track 1
+	
+	isTrackEnabled				long index	-			Returns True if the track at "index" is enabled.	1
+	isTrackAutomationEnabled	long index, 
+								long plug Index	-		Returns True if the track at "index" has automation enabled.1
+	enableTrack					long index	-			Toggle the enabled state of the track at "index".	1
+	isTrackMuted				long index	-			Returns True if the track at "index" is muted.	2
+	muteTrack					long index	-			Toggle Mute state of the track at "index".	2
+	isTrackMuteLock				long index	
+								long					Returns True if the Mute for track at "index" is locked.	13
+	getTrackPluginId			long index, 
+								long plugIndex	
+								long					Returns plugin id of plugin with plugIndex on the track at "index".	
+	isTrackPluginValid			long index, 
+								long plugIndex	
+								long					Returns True if plugin with plugIndex on the track at "index". is 	valid	1
+	getTrackVolume				long index, 
+								(long mode* = 0)	
+								float					Returns the normalized volume (between 0 and 1.0) of the track at 	"index" - set optional mode to 1 to get volume in dB	1, *14
+	setTrackVolume				long index, 
+								float volume, 
+								(long pickupMode* = PIM_None)	-	Changes the volume of the track at "index" - 		volume is value between 0 and 1.0
+																	use optional pickupMode to override FL default pickup option	1, 13(pickup)
+	getTrackPan					long index	
+								float					Returns the pan value (between -1.0 and 1.0) for the track at "index".	1
+	setTrackPan					long index, 
+								float pan, 
+								(long pickupMode* = PIM_None)	-	Changes the panning for the track at "index". "pan"
+														pan value is between -1.0 and 1.0 - use optional pickupMode to override FL default pickup option	1, 13(pickup)
+	getTrackStereoSep			long index	
+								float					Returns the stereo separation value (between -1.0 and 1.0) for the track at "index" - set optional 'pickup' to 1 to use pickup function, or to 2 to follow FL global pickup setting	12, 13(pickup)
+	setTrackStereoSep			long index, 
+								float sep, 
+								(long pickup = 0)	-	Changes the stereo separation for the track at "index". "sep"
+														sep value is between -1.0 and 1.0.	12
+	isTrackSelected				long index	
+								long					Returns True if the track at "index" is selected.	1
+	selectTrack					long index	-			Toggle selection of the track at "index".	1
+	selectAll					-	-					Select all mixer tracks.	1
+	deselectAll					-	-					eselect all mixer tracks.	1
+	setRouteTo					long index, 
+								long destIndex, 
+								long value	-			Set route for track at "index" to "destIndex".	1
+	getRouteSendActive			long index, 
+								long destIndex	
+								long					Returns True if route sends from track at "index" to "destIndex" is active.	1
+	afterRoutingChanged			-	-					Notify FL about routing changes.	1
+	getEventValue				long index, 
+								(long value = MaxInt), 
+								(long smoothTarget = 1)	
+								long					Returns event value from MIDI.	1
+	remoteFindEventValue		long index, 
+								(long flags = 0)	
+								float					Returns event value.	1
+	getEventIDName				long index, 	
+								(long shortName = 0)	Returns event name (set shortName to True for short name).	1
+	getEventIDValueString		long index, 
+								long value	
+								string					Returns event value as string.	1
+	getAutoSmoothEventValue		long index, 
+								(long locked = 1)	
+								long					Returns auto smooth event value.	1
+	automateEvent				long index, 
+								long value, 
+								long flags, 
+								(long speed = 0), 
+								(long isIncrement = 0), 
+								(float res = EKRes)	
+								long					Automate event	1
+	getTrackPeaks				long index, 
+								long mode	
+								float					Returns peaks for track at "index"
+														returned value is between 0 (silence) and 1 (0db) or < 1 (clipping)	1
+	getTrackRecordingFileName	long index	
+								string					Returns recording file name for track at "index"	1
+	linkTrackToChannel			long mode	-			Link track to channel
+														"mode" can be one of the: ROUTE_ToThis = 0, ROUTE_StartingFromThis = 1	1
+	getSongStepPos				-	long				Returns song step position.	1
+	getCurrentTempo				(long asInt = 0)	
+								long/float				Returns current tempo - set optional "asInt" to True to get result as long	1
+	getRecPPS					-	long				Returns recording pps.	1
+	getSongTickPos				(long mode = ST_Int)	long/float	Returns song ticks pos.	1
+	getLastPeakVol				long section	
+								float					Returns last peak volume. Set section to 0 for left volume or to 1 for right volume.	9
+	getTrackDockSide			long index	
+								long					Returns dock side of the mixer track (index). (0 = left, 1 = center, 2 = right)
+														listen to OnRefresh event (HW_Dirty_Mixer_Controls) flag to update on dock changes	13
+	isTrackSlotsEnabled			long index	
+								long					Returns state of mixer track (index) 'Enable effect slots' option.	19
+	enableTrackSlots			long index, 
+								(long value = -1)	
+								long					Toggle mixer track (index) 'Enable effect slots' option. (value: -1 = toggle, 0 = disable, 1 = enable)	19
+	isTrackRevPolarity			long index	
+								long					Returns state of mixer track (index) 'reverse polarity' option.	19
+	revTrackPolarity			long index, 
+								(long value = -1)	
+								long					Toggle mixer track (index) 'reverse polarity' option. (value: -1 = toggle, 0 = disable, 1 = enable)	19
+	isTrackSwapChannels			long index	
+								long					Returns state of mixer track (index) 'swap l/r channels' option.	19
+	swapTrackChannels			long index, 
+								(long value = -1)	
+								long					Toggle mixer track (index) 'swap l/r channels' option. (value: -1 = toggle, 0 = disable, 1 = enable)	1
+
+Patterns module:
+
+	Patterns module allows you to control FL Studio Playlist Patterns
+
+	Command						Arguments			Result	Documentation	Version
+
+	patternNumber	-			long				Returns the current pattern number.	1
+	patternCount	-			long				Returns the number of patterns.	1
+	patternMax	-				long				Returns the maximum pattern number.	1
+	getPatternName				long index	
+								string				Returns the name of the pattern at "index".	1
+	setPatternName				long index, 
+								string name	-		Changes the name of the pattern at "index" to "name".	1
+	getPatternColor				long index	
+								long				Returns the color of the pattern at "index".	1
+	setPatternColor				long index, 
+								long color	-		Changes the color of the pattern at "index" to "color".	1
+	getPatternLength			long index	
+								long				Returns the length of the pattern at "index", in beats.	1
+	getBlockSetStatus			long left, 
+								long top, 
+								long right, 
+								long bottom	
+								long				Returns the status of the live block - Result is one of the LB_Status_Simplest option constants	1
+	ensureValidNoteRecord		long index, 
+								(long playNow = 0)	-	Ensure valid note of the pattern at "index".	1
+	jumpToPattern				long index	-		Jum to the pattern at "index"	1
+	findFirstNextEmptyPat		long flags, 
+								(long x = -1), 
+								(long y = -1)	-	Find first empty pattern at position x, y	1
+
+	Picker panel functions:
+	isPatternSelected			long index	
+								long				Returns True if patterns at "index" is selected in Picker panel.	2
+	selectPattern				long index, 
+								(long value = -1), 
+								(long preview = 0)	-	Select pattern at "index" in Picker panel - value: -1 (toggle), 0 (deselect) 1 (select)
+														preview: set to 1 to preview pattern	2
+	selectAll					-	-				Select all patterns in Picker panel.	2
+	deselectAll					-	-				Deselect all patterns in Picker panel.	2
+	burnLoop					long index, 
+								(long storeUndo = 1), 
+								(long updateUi = 1)	-	Returns activity level for channel at "index" - Set Optional storeUndo to 0 to not store undo step.
+													Set Optional updateUi to 0 to not update ui. 9
+
+Arrangement module
+		Arrangement module allows you to control FL Studio Playlist Arrangements
+
+	Command				Arguments	Result	Documentation	Version
+	jumpToMarker		long index, long select	-	Select a marker - set "index" to -1, to select the previous marker or to +1 to select the next marker - set "select" to True to select marker as well.	1
+	getMarkerName		long index	string	Returns the name of the requested marker - If the marker doesn't exist, an empty string is returned.	1
+	addAutoTimeMarker	long time, string name	-	Add an automatic time marker at "time" with its name set to "name"	1
+	liveSelection		long time, long stop	-	Set a live selection point at "time" - set "stop" to True, to use end point of the selection (instead of start).	1
+	liveSelectionStart	long	Returns the start time of the current live selection.	1
+	currentTime			long snap	long	Returns the current time in the current arrangement - set "snap" to True, to get returned value snapped to the grid.	1
+	currentTimeHint		long mode, long time, (long setRecPPB = ), (long isLength = 0)	string	Returns a hint string for the requested "time" in the current arrangement - "mode" is 0 for pattern mode and 1 for song mode.	1
+	selectionStart	-	long	Returns the start time of the current selection in the current arrangement.	1
+	selectionEnd	-	long	Returns the end time of the current selection in the current arrangement.	1
+
+User interface module
+
+	Unless otherwise specified, these functions returns how the request was handled.
+
+	Command		Arguments	Result	Documentation	Version
+
+	jog			long value	long	Generic jog control. Can be used to select stuff. "value" is an increment.	1
+	jog2		long value	long	Alternate jog control. Can be used to relocate stuff. "value" is an increment.	1
+	strip		long value	long	Touch-sensitive strip. "value" is -midi.FromMIDI_Max (left most) to midi.FromMIDI_Max (right most).	1
+	stripJog	long value	long	Touch-sensitive strip in jog mode. "value" is an increment.	1
+	stripHold	long value	long	Touch-sensitive strip in hold mode - "value" is 0 for release, 1 and 2 for 1 or 2 fingers centered mode, -1 and -2 for 1 or 2 fingers jog mode.	1
+	previous	-	long	Generic previous control - in mixer: select previous mixer track
+	in channel rack: select previous channel
+	in browser: scroll to previous item
+	in plugin: select previous preset*	1, *9
+	next	-	long	Generic next control - in mixer: select next mixer track
+	in channel rack: select next channel
+	in browser: scroll to next item
+	in plugin: select next preset*	1, *9
+	moveJog	long value	long	Used to relocate items. "value" is an increment.	1
+	up	(long value* = 1)	long	Generic way to move up.	1, *4
+	down	(long value* = 1)	long	Generic way to move down.	1, *4
+	left	(long value* = 1)	long	Generic way to move left.	1, *4
+	right	(long value* = 1)	long	Generic way to move right.	1, *4
+	horZoom	long value	long	Zoom horizontally by the increment "value".	1
+	verZoom	long value	long	Zoom vertically by the increment "value".	1
+	snapOnOff	-	long	Toggle the snap value.	1
+	cut	-	long	Cut what is selected, if possible.	1
+	copy	-	long	Copy what is selected, if possible.	1
+	paste	-	long	Paste previously copied data, if possible.	1
+	insert	-	long	Press the insert key.	1
+	delete	-	long	Press the delete key.	1
+	enter	-	long	Press the enter key.	1
+	escape	-	long	Press the escape key.	1
+	yes	-	long	Press the 'Y' key.	1
+	not	-	long	Press the 'N' key.	1
+
+	FL Studio Hints:
+
+	getHintMsg	-	string	Returns program hint message	1
+	setHintMsg		string msg	-	Set program hint message	1
+	getHintValue	long value, long max	string	Returns hint for value	1
+	getTimeDispMin	-	long	Returns True when time display is set to 'minutes'	1
+	setTimeDispMin	-	-	Set time display to minutes	1
+
+	Window handling:
+
+	getVisible		long index	long	Returns visible state (0 or 1) of window specified by index	1
+	showWindow		long index	-	Show window specified by index	1
+	hideWindow		long index	-	Hide window specified by index	5
+	getFocused		long index	long	Returns focused state (0 or 1) of window specified by index	1
+	setFocused		long index	-	Set focused state (0 or 1) of window specified by index	2
+	getFocusedFormCaption	-	string	Returns caption of focused window	1
+	getFocusedFormID	-	long	Returns ID of focused window. This ID is:
+	- FL Window constant when Channel rack, Browser, Mixer, Playlist or Piano Roll is focused..
+	- channel index for Generator plugins or -1 fopr invalid plugin
+	- effect plugin id: (track << 6 + index) << 16	13
+	getFocusedPluginName	-	string	Returns Original Plugin Name of focused window	5
+	scrollWindow	long index, long value, (directionFlag* = 0)	-	Scroll window specified by index
+					value is track number(mixer), channel number(channel rack), playlist track(playlist) or channel step(channel rack), playlist bar(playlist) when directionFlag is set to 1	13, *15
+	nextWindow	-	long	Focus the next window.	1
+	selectWindow	long shift	long	Press the TAB key - set "shift" to True, to make it act as if Shift + TAB is pressed.	1
+	launchAudioEditor	long reuse, string filename, long index, string preset, string presetGUID	long	Launch audio editor for track at "index" and returns editor state
+	set "reuse" to True to reuse opened audio editor (if any)
+	"filename" is path to audio file
+	1
+	openEventEditor	long eventId, long mode, (long newWindow = 0)	long	Launch event editor for "eventId"
+	example: openEventEditor(channels.getRecEventId(0) + midi.REC_Chan_PianoRoll, midi.EE_PR) to open piano roll for channel 0	9
+
+	Menu handling:
+
+	isInPopupMenu	-	long	Returns True when application popup menu is active	1
+	closeActivePopupMenu	-	-	Close active popup menu	1
+
+	Helpers:
+
+	isClosing	-	long	Returns True if application is closing	1
+	isMetronomeEnabled	-	long	Returns True when metronome is enabled.	1
+	isStartOnInputEnabled	-	long	Returns True when start on input is enabled.	1
+	isPrecountEnabled	-	long	Returns True when precount is enabled.	1
+	isLoopRecEnabled	-	long	Returns True when loop recording is enabled.	1
+	getSnapMode	long value	long	Returns snap mode.	1
+	snapMode	long value	long	Select another snap mode - "value" is an increment: -1 (previous), 1 (next) mode.	1
+	getProgTitle	-	string	Returns program title	1
+	getVersion	(long mode* = 4)	string / long	Returns program version string (or number)
+	optional mode parameter can be one of the following: VER_Major = 0; VER_Minor = 1; VER_Release = 2; VER_Build = 3; VER_VersionAndEdition = 4; VER_FullVersionAndEdition = 5; VER_ArchAndBuild = 6 **	1, *7, **13
+	crDisplayRect	long left, long top, long right, long bottom, long duration, (long flags* = 0)	-	Display channel rack selection rectangle - by default selection works on channel rack steps, see flags for additional options
+	set 'duration' in ms, or use duration = midi.MaxInt to set rectangle 'on' and duration = 0 (**) to set rectangle 'off'	1, *14, **16
+	miDisplayRect	long start, long end, long duration, (long flags** = 0)	-	Display mixer selection rectangle - define "start" and "end" track number, use 0 for Master track, 126 for Current track
+	set 'duration' in ms, or use duration = midi.MaxInt to set rectangle 'on' and duration = 0 (*) to set rectangle 'off'	13, *16, **17
+
+Transport module
+
+	This module handles FL Studio Transport (Play, Stop, Pause & Record)
+
+	Command	Arguments	Result	Documentation	Version
+	globalTransport	long command, long value, (long pmeflags = PME_System), (long flags = GT_ALL)	long	Call the GlobalTransport function with the appropriate parameters - Use this function inside one of the eventData script events and pass eventData.pmeflags as "pmeflags" parameter
+										1
+	start	-	-	Start playback.	1
+	stop	-	-	Stop playback.	1
+	record	-	-	Toggle recording.	1
+	isRecording	-	long	Returns True when recording is active.	1
+	getLoopMode	-	long	Returns the current looping mode (pattern = 0, song = 1).	1
+	setLoopMode	-	Toggle loop mode.	1
+	getSongPos		(long mode* = -1)	float	Returns the song position as a normalized value (0..1) - or in specified format when mode* is set	1, *3
+	setSongPos		float position, (long mode* = -1)	-	Set the song position - "position" is a normalized value (0..1) - or in specified format when mode* is set	1, *4
+	getSongLength	long mode	-	Get the song length.	3
+	getSongPosHint	string	Returns a hint for the current song position.	1
+	isPlaying	-	long	Returns True if the program is playing.	1
+	markerJumpJog	long value, (long flags = GT_All)	-	Jump to a marker position - "value" is an increment.	1
+	markerSelJog	long value, (long flags = GT_All)	-	Select a marker - "value" is an increment.	1
+	getHWBeatLEDState	-	long	Returns the state of the hardware LED beat indicator.	1
+
+	Playback speed control:
+	rewind			long startStop, (long flags = GT_All)	-	Rewind the song position - Each call to this function with startStop = SS_Start, must be stopped with startStop = SS_Stop	1
+	fastForward		long startStop, (long flags = GT_All)	-	Forward the song position - Each call to this function with startStop = SS_Start, must be stopped with startStop = SS_Stop	1
+	continuousMove	long speed, long startStop	-	Start Continuous move - This function do same as rewind and fastforward but you can control speed.
+	Set speed (> 0) to move forward and (< 0) to move backward (speed = (1) is normal speed forward)
+	Each call to this function with startStop = SS_Start, must be stopped with startStop = SS_Stop	1
+	continuousMovePos	long speed, long startStop	-	Start Continuous move - Set speed (> 0) to move forward and (< 0) to move backward (speed = (1) is normal speed forward).
+	Set startStop to (2) to start and to (0) to stop	2
+	setPlaybackSpeed	float speedMultiplier	-	Set a playback speed multiplier - Set speedMultiplier = (1) is normal speed, set to value between (1/4 ... 1) for slower and between (1 ... 4) faster movement	1
+
+Device module
+
+	Device module will handle MIDI devices connected to the FL Studio MIDI interface. You send messages to output interface, retrieve linked control values... etc). MIDI scripts, assigned to an input interface, can be mapped (linked) to an Output interface via the Port Number. With mapped (linked) output interfaces, scripts can send midi messages to output interfaces by using one of the midiOut*** messages.
+
+	Command	Arguments	Result	Documentation	Version
+
+	isAssigned	-	long	Returns True if (linked) output interface is assigned.	1
+	getPortNumber	-	long	Returns the interface port number. (or -1 when port number is not assigned)
+	this is same number as interface port number set in FL Studio Midi settings	1
+	getName	-	long	Returns the device name	7
+	midiOutMsg	long message	-	Send a MIDI message to the (linked) output interface - "message" holds the value to be sent, with the channel and command in the lower byte and the first and second data values in the next two bytes.	1
+	long midiId, long channel, long data1, long data2	-	Send a MIDI message to the (linked) output interface (alternative version with separate parameters)	2
+	midiOutNewMsg	long slotIndex, long message	-	Send a MIDI message to the (linked) output interface, but only if the value has changed - "slotIndex" is a value chosen by the caller, it should be the same as it was for the previous message that should be compared with - "message" holds the value to be sent.	1
+	midiOutSysex	string message	-	Send a SYSEX message to the (linked) output interface.	1
+	sendMsgGeneric (deprecated)	int64 id, string message, string lastMsg, (long offset = 0)	string	Send a text string as a SYSEX message to the (linked) output interface - "id" holds the first 6 bytes of the message (starting with 0xF0). The end value 0xF7 is added automatically - "message" is the text to send
+	"lastMsg" is the string returned by the previous call to this function - function returns updated lastMsg	1
+	processMIDICC	eventData	-	Let FL process a CC message - use this function inside OnMidiMsg and pass (modified) eventData object as function parameter	1
+	forwardMIDICC	long message, (long mode = 1)	-	Forward CC message to plugin - Use this function to forward midi cc messages to FL plugin(s) - Specify message as: message = status + (data1 << 8) + (data2 << 16) + (port << 24)
+	Message will be forwarded to active (focused) plugin - Use optional mode parameter to send message to selected channel (mode = 2) or to all plugins (0) - Remark: midi input port of plugin must be equal to port specified in message.	7
+	directFeedback	eventData	-	Send a received message on to the (linked) output interface - use this function inside OnMidiMsg and pass (modified) eventData object as function parameter	1
+	repeatMidiEvent	eventData, (long delay = 300, long rate = 300)	-	Start repeatedly sending out the previously sent message - It will be sent first after "delay" milliseconds, and afterwards every "rate" milliseconds.	1
+	stopRepeatMidiEvent	-	-	Stop repeating the message sent with repeatMidiEvent.	1
+	Control events:
+	findEventID	long controlId, (long flags = [])	long	Returns eventID for controlId - "flags" can be one of the: FEID_Flags_Skip_Unsafe = 1 (skip unsafe (using formula) links)	1
+	getLinkedValue	long eventID	float	Returns normalized value of the linked control via eventID
+	(to get control eventId, use findEventID function) - Result is -1 if there is no linked control.	1
+	getLinkedValueString	long eventID	string	Returns text value of linked control via eventID
+	(to get control eventId, use findEventID function) - Result is ERR_PLUGINNOTVALID if there is no linked control.	10
+	getLinkedParamName	long eventID	string	Returns parameter name of the control linked via eventID
+	(to get control eventId, use findEventID function) - Result is ERR_PLUGINNOTVALID if there is no linked control.	10
+	getLinkedInfo	long eventID	long	Returns information about the linked control via eventID
+	(to get control eventId, use findEventID function) - Result is -1 if there is no linked control, otherwise result is one or more of the constants	1
+	Refresh thread:
+	createRefreshThread	-	-	Start a threaded refresh of the entire MIDI device.	1
+	destroyRefreshThread	-	-	Stop a previously started threaded refresh.	1
+	fullRefresh	-	-	Trigger a previously started threaded refresh - If there is none, the refresh is triggered immediately.	1
+
+	Helpers:
+
+		isDoubleClick	long index	long	Returns True if the function was called with the same index shortly before, indicating a double click.	1
+		setHasMeters	-	-	use this in OnInit event to tell FL Studio device use peak meters	1
+		baseTrackSelect	long index, long step	-	Base track selection (for control surfaces). Set step to MaxInt for reset.	1
+		hardwareRefreshMixerTrack	long index	-	Let FL Studio dispatch OnDirtyMixerTrack event to all midi devices. Use index = -1 for all tracks	1
+		Dispatching between devices:
+		dispatch	long ctrlIndex, long message, (bytes sysex)	-	Dispatch midi message (or sysex) to controller specified by ctrlIndex - receiver (script) must define sender(s) inside script: # receiveFrom="Sender name"	1
+		dispatchReceiverCount	-	long	Returns number of available receivers.	1
+		dispatchGetReceiverPortNumber	long ctrlIndex	long	Returns port number of receiver specified by ctrlIndex.	5
+		setMasterSync	long value	-	Toggle (value = 1 to enable, 0 to disable) send master synch for current device	18
+		getMasterSync	-	long	Returns 'send master synch' state for current device (1 = enableb)	19
+
+Plugins module
+	This module handles FL Studio plugins (by their position in mixer or channel rack)
+	to access generator plugins (channel rack), specify channel rack index, for effects specify mixer index and slotIndex.
+
+	Command			Arguments	Result	Documentation	Version
+
+	isValid			long index, (long slotIndex = -1)	long	Returns true if there is valid plugin at position of index/slotindex	8
+	getPluginName	long index, (long slotIndex = -1), (long userName* = 0)	string	Returns plugin name for plugin at position of index/slotindex - Set optional userName parameter to 1 to get user name for plugin slot instead of original plugin name (will return plugin name if user didn't change name for slot)	8, *12
+	getParamCount	long index, (long slotIndex = -1)	long	Returns plugin parameter count for plugin at position of index/slotindex	8
+	getParamName	long paramIndex, long index, (long slotIndex = -1)	string	Returns plugin parameter (paramIndex) name for plugin at position of index/slotindex	8
+	getParamValue	long paramIndex, long index, (long slotIndex = -1)	long	Returns plugin parameter (paramIndex) value for plugin at position of index/slotindex as normalized value	8
+	setParamValue	float value, long paramIndex, long index, (long slotIndex = -1), (long pickupMode* = PIM_None)	long	Sets value (normalized) for plugin parameter (paramIndex) for plugin at position of index/slotindex
+								use optional pickupMode to override FL default pickup option	8, *17
+	getParamValueString	long paramIndex, long index, (long slotIndex = -1)	string	Returns plugin parameter (paramIndex) value as string for plugin at position of index/slotindex
+	this function is only supported by some of the plugins, support for more plugins will be added later	8
+	getColor	long index, (long slotIndex = -1), (long flag = GC_BackgroundColor), (long paramIndex = 0)	long	Returns various plugin color parameter values for plugin at position of index/slotindex	12
+	getName	long index, (long slotIndex = -1), (long flag = FPN_Param), (long paramIndex = 0)	string	Returns various plugin name parameter values for plugin at position of index/slotindex
+						optional paramIndex depends on flag	13
+	getPadInfo	long chanIndex, (long slotIndex), (long paramOption), (long paramIndex)	string	Returns pad parameters for plugin at position of index/slotindex
+							use PAD_Count as paramOption to get number of pad parameters supported by plugin	19
+	getPresetCount	long index, (long slotIndex = -1)	long	Returns number of presets for plugin at position of index/slotindex	15
+	nextPreset	long index, (long slotIndex = -1)	-	Navigate to next preset in plugin at position of index/slotindex	10
+	prevPreset	long index, (long slotIndex = -1)	-	Navigate to previous preset in plugin at position of index/slotindex	10
+
+General module
+	This module handles general FL Studio functions
+
+	Command		Arguments	Result	Documentation	Version
+
+	saveUndo	string undoName, long flags, (long update = 1)	-	Saves undo history point (level)	1
+	undo	-	long	Undo last history point (level)	1
+	undoUp	-	long	Move up in undo history (up one level)	1
+	undoDown	-	long	Move down in undo history (down one level)	4
+	undoUpDown	long offset	long	Move up or down in undo history by offset	1
+	restoreUndoLevel	long level	-	Restore to specific undo point (level)	1
+	getUndoLevelHint	-	string	Returns undo level hint	1
+	getUndoHistoryPos	-	long	Returns undo history position	1
+	getUndoHistoryCount	-	long	Returns undo history length	1
+	getUndoHistoryLast	-	long	Returns last undo history position	1
+	setUndoHistoryPos	long index	-	Set undo history position	1
+	setUndoHistoryCount	long value	-	Set undo history count	1
+	setUndoHistoryLast	long index	-	Set undo history last position	1
+	getRecPPB	-	long	Returns the current time signature value. (Timebase * Numerator)	1
+	getRecPPQ	-	long	Returns the current timebase (PPQ)	8
+	getUseMetronome	-	long	Returns True when metronome is used	1
+	getPrecount	-	long	Returns precount value	1
+	getChangedFlag	-	long	Get FL Studio project "changed' flag
+	Result is one of the: 0 = clean, 1 = dirty, 2 = dirty but clean for autosave	1
+	getVersion	-	long	Returns Midi scripting API version number	1
+	restoreUndo	-	long	Deprecated, use undo	1
+	processRECEvent	long eventId, long value, long flags	long	Process recorded event for event with eventID
+	Use this function to do various operations (specified by flags) with FL Studio recorded events, you can for example set or get event values.
+	Function wil return event value or REC_InvalidID (for invalid eventID)	7
+	dumpScoreLog	long time, (long silent = 0)	-	Dump score log, specify time to dump (time), use optional (silent) flag to supress message when score is empty	15
+	clearLog	-	-	Clear log	15
+
+LaunchMapPages module
+	Some controllers support pages (custom controller layouts), this optional module helps to handle this pages.
+
+	LaunchMapPages reference
+
+	Command				Arguments	Result	Documentation	Version
+	init				string deviceName, long width, long height	-	Initialize launchmap pages.	1
+	createOverlayMap	long offColor, long onColor, long width, long height	-	Creates overlay map.	1
+	length	-			long	Returns launchmap pages length.	1
+	updateMap			long index	long	Updates launchmap page at "index".	1
+	getMapItemColor		long index, long itemIndex	long	Returns color at "itemIndex" of page at "index"	1
+	getMapCount			long index	long	Returns length of items of page at "index"	1
+	getMapItemChannel	long index, long itemIndex	long	Returns destination channel at "itemIndex" of page at "index"	1
+	getMapItemAftertouch	long index, long itemIndex	long	Returns aftertouch for item at "itemIndex" of page at "index"	1
+	processMapItem		eventData, long index, long itemIndex, long velocity	-	Process map item at "itemIndex" of page at "index"	1
+	releaseMapItem		eventData, long index	-	Release map item at "itemIndex" of page at "index"	1
+	checkMapForHiddenItem	-	-	Checks for launchpad hidden item.	1
+	setMapItemTarget	long index, long itemIndex, long target	long	Set target for item at "itemIndex" of page at "index".	1
+
+Types eventData
+
+
+	Parameter	Type	Documentation
+	handled	bool (r/w)	set to True to stop event propagtion
+	timestamp	time (r)	timestamp of event
+	status	long (r/w)	MIDI status
+	data1	long (r/w)	MIDI data1
+	data2	long (r/w)	MIDI data2
+	port	long (r)	MIDI port
+	note	long (r/w)	MIDI note number
+	velocity	long (r/w)	MIDI velocity
+	pressure	long (r/w)	MIDI pressure
+	progNum	long (r)	MIDI program number
+	controlNum	long (r)	MIDI control number
+	controlVal	long (r)	MIDI control value
+	pitchBend	long (r)	MIDI pitch bend value
+	sysex	bytes (r/w)	MIDI sysex data
+	isIncrement	bool (r/w)	MIDI is increament state
+	res	double (r/w)	MIDI res
+	inEv	long (r/w)	MIDI inEv
+	outEv	long (r/w)	MIDI outEv
+	midiId	long (r/w)	MIDI midiID
+	midiChan	long (r/w)	MIDI midiChan (0 based)
+	midiChanEx	long (r/w)	MIDI midiChanEx
+	pmeflags	long (r)	MIDI pmeflags
+
+Constants
+	All constants below are defined in module 'midi'. Include the MIDI module at the top of the script with 'import':
+
+	import midi
+	OnProjectLoad status
+	Parameter	Value	Documentation
+	PL_Start	0	Called when project loading start
+	PL_LoadOk	100	Called when project was succesfully loaded
+	PL_LoadError	101	Called when project loading stopped because of error
+
+OnDirtyChannel flags
+	Parameter	Value	Documentation
+	CE_New	0	new channel is added
+	CE_Delete	1	channel deleted
+	CE_Replace	2	channel replaced
+	CE_Rename	3	channel renamed
+	CE_Select	4	channel selection changed
+
+OnRefresh flags
+	Parameter	Value	Documentation
+	HW_Dirty_Mixer_Sel	1	mixer selection changed
+	HW_Dirty_Mixer_Display	2	mixer display changed
+	HW_Dirty_Mixer_Controls	4	mixer controls changed
+	HW_Dirty_RemoteLinks	16	remote links (linked controls) has been added/removed
+	HW_Dirty_FocusedWindow	32	channel selection changed
+	HW_Dirty_Performance	64	performance layout changed
+	HW_Dirty_LEDs	256	various changes in FL which require update of controller leds
+	update status leds (play/stop/record/active window/.....) on this flag
+	HW_Dirty_RemoteLinkValues	512	remote link (linked controls) value is changed
+	HW_Dirty_Patterns	1024	pattern changes
+	HW_Dirty_Tracks	2048	track changes
+	HW_Dirty_ControlValues	4096	plugin cotrol value changes
+	HW_Dirty_Colors	8192	plugin colors changes
+	HW_Dirty_Names	16384	plugin names changes
+	HW_Dirty_ChannelRackGroup	32768	Channel rack group changes
+	HW_ChannelEvent	65536	channel changes
+Live status mode
+	Parameter	Value	Documentation
+	LB_Status_Default	0 (Default)	Result will be one or more of: any filled = 1, any scheduled = 2, any playing = 4
+	LB_Status_Simple	1	Result will be one of the: empty = 0, filled = 1, none playing (or scheduled) = 2, none scheduled (and not playing) = 3
+
+Live block status mode
+	Parameter	Value	Documentation
+	LB_Status_Default	0 (Default)	Result will be one or more of: filled = 1, scheduled = 2, playing = 4
+	LB_Status_Simple	1	Result will be one of the: empty = 0, filled = 1, playing (or scheduled) = 2, scheduled (and not playing) = 3
+	LB_Status_Simplest	2	Result will be one of the: empty = 0, filled = 1, playing or scheduled = 2
+
+Live block status flags
+	Parameter	Value	Documentation
+	LB_Status_Filled	1	Filled
+	LB_Status_Scheduled	2	Scheduled
+	LB_Status_Playing	4	Playing
+
+Track solor mode
+	Parameter	Value	Documentation
+	fxSoloModeWithSourceTracks	0	Solo mixer track (include tracks routed to it)
+	fxSoloModeWithDestTracks	1	Solo mixer track (include sends)
+	fxSoloModeIgnorePrevious	2	(TODO: needs explanation)
+
+Live loop mode
+	Parameter	Value	Documentation
+	LiveLoop_Stay	0	Stay
+	LiveLoop_OneShot	1	One shot
+	LiveLoop_MarchWrap	2	March and wrap
+	LiveLoop_MarchStay	3	March and stay
+	LiveLoop_MarchStop	4	March and stop
+	LiveLoop_Random	5	Random
+	LiveLoop_ExRandom	6	Random (avoid previous)
+
+Live trigger mode
+	Parameter	Value	Documentation
+	LiveTrig_Retrigger	0	Retrigger
+	LiveTrig_Hold	1	Hold and stop
+	LiveTrig_HMotion	2	Hold and motion
+	LiveTrig_Latch	3	Latch
+
+Live Snap
+	Parameter	Value	Documentation
+	LiveSnap_Off	0	Off
+	LiveSnap_Fourth	1	1/4 beat
+	LiveSnap_Half	2	1/2 beat
+	LiveSnap_One	3	1 beat
+	LiveSnap_Two	4	2 beats
+	LiveSnap_Four	5	4 beats
+	LiveSnap_Auto	6	Auto
+
+Channel types
+	Parameter	Value	Documentation
+	CT_Sampler	0	Internal sampler
+	CT_Hybrid	1	generator plugin feeding internal sampler
+	CT_GenPlug	2	generator plugin
+	CT_Layer	3	Layer
+	CT_AudioClip	4	Audio clip
+	CT_AutoClip	5	Automation clip
+
+Channel rack rectangle flags
+	Parameter	Value	Documentation
+	CR_HighlightChannels	1	when specified, crDisplayRect works on channels instead of steps
+	CR_ScrollToView	2	scroll channel rack rectangle to view
+	CR_HighlightChannelMute	4	when specified, crDisplayRect works on channels and highlights only mute control
+	CR_HighlightChannelPanVol	8	when specified, crDisplayRect works on channels and highlights only pan and volume controls
+	CR_HighlightChannelTrack	16	when specified, crDisplayRect works on channels and highlights only track control
+	CR_HighlightChannelName	32	when specified, crDisplayRect works on channels and highlights only channel name button
+	CR_HighlightChannelSelect	64	when specified, crDisplayRect works on channels and highlights only channel selection control
+
+Trigger live clip flags
+	Parameter	Value	Documentation
+	TLC_MuteOthers	1	(TODO: needs explanation)
+	TLC_Fill	2	(TODO: needs explanation)
+	TLC_Queue	4	Queue mode
+	TLC_Release	32	(TODO: needs explanation)
+	TLC_NoPlayCheck	64	(TODO: needs explanation)
+	TLC_NoHardwareUpdate	1073741824	(TODO: needs explanation)
+	TLC_SecondPass	2147483648	(TODO: needs explanation)
+	TLC_ColumnMode	128	Scene mode
+	TLC_WeakColumnMode	256	+ Scene mode
+	TLC_TriggerCheckColumnMode	512	(TODO: needs explanation)
+	TLC_TrackSnap	0	Use performance mode track setting trigger snap
+	TLC_GlobalSnap	8	Use FL global snap value as trigger snap
+	TLC_NoSnap	16	Bypass all tigger snap
+	TLC_SubNum_Normal	0	(TODO: needs explanation)
+	TLC_SubNum_ClipPos	65536	(TODO: needs explanation)
+	TLC_SubNum_GroupNum	131072	(TODO: needs explanation)
+	TLC_SubNum_Read	196608	(TODO: needs explanation)
+	TLC_SubNum_Leave	262144	(TODO: needs explanation)
+
+REC events
+	Parameter	Value	Documentation
+	REC_Chan_Vol	0	Channel volume
+	REC_Chan_Pan	1	Channel pan
+	REC_Chan_FCut	2	Channel filter cutoff
+	REC_Chan_FRes	3	Channel filter resonance
+	REC_Chan_Pitch	4	Channel pitch
+	REC_Chan_FType	5	Channel filter type
+	REC_Chan_PortaTime	6	Channel portamento time
+	REC_Chan_Mute	7	Channel Mute
+	REC_Chan_FXTrack	8	Chanel FX target
+	REC_Chan_GateTime	9	Channel gate time
+	REC_Chan_Crossfade	10	Channel crossfade
+	REC_Chan_TimeOfs	11	Time offset
+	REC_Chan_SwingMix	12	Swing mix
+	REC_Chan_SmpOfs	13	Sample offset
+	REC_Chan_StretchTime	14	Time stretch time
+	REC_Chan_OfsPan	16	Levels adjustment pan
+	REC_Chan_OfsVol	17	Levels adjustment volume
+	REC_Chan_OfsPitch	18	Levels adjustment pitch
+	REC_Chan_OfsFCut	19	Levels adjustment Mod X
+	REC_Chan_OfsFRes	20	Levels adjustment Mod Y
+	use above parameters together with channel rec event id getRecEventId
+	for example, to change volume for channel at 'index' use:
+	midi.REC_Chan_Vol + channels.getRecEventId(index)
+
+Parameter	Value	Documentation
+	REC_Mixer_Vol	536879040	Mixer volume
+	REC_Mixer_Pan	536879041	Mixer pan
+	REC_Mixer_SS	536879042	Mixer stereo separation
+	REC_Mixer_EQ_Gain	536879056	Mixer EQ gain
+	REC_Mixer_EQ_Freq	536879064	Mixer freq
+	REC_Mixer_EQ_Q	536879072	Mixer Q
+	REC_Mixer_EQ_Type	536879080	Mixer type
+	use above parameters together with mixer track plugin id getTrackPluginId
+	for example, to change volume for mixer track at 'index' use:
+	midi.REC_Mixer_Vol + mixer.getTrackPluginId(index, 0)
+
+REC event flags
+	Parameter	Value	Documentation
+	REC_UpdateValue	1	update the value
+	REC_GetValue	2	retrieves the value
+	REC_ShowHint	4	updates the hint (if any)
+	REC_UpdatePlugLabel	16	updates the label for the plugin param
+	REC_UpdateControl	32	updates the wheel/knob
+	REC_FromMIDI	64	value from 0 to FromMIDI_Max has to be translated
+	REC_Store	128	store value when recording automation
+	REC_SetChanged	256	set the changed flag
+	REC_SetTouched	512	set as touched event
+	REC_Init	1024	make sure to init the channel with the previous value before storing
+	REC_NoLink	2048	don't check if wheels are linked
+	REC_InternalCtrl	4096	sent by an internal controller
+	REC_PlugReserved	8192	free to use by plugins
+	REC_Smoothed	16384	smoothed up controller, almost same as internal controller
+	REC_NoLastTweaked	32768	coming from last tweaked
+	REC_NoSaveUndo	65536	used when undoing a previous change
+	REC_InitStore	REC_Init | REC_Store	combined parameter for control automation recording
+	REC_Control	REC_UpdateValue | REC_UpdateControl | REC_ShowHint | REC_InitStore | REC_SetChanged | REC_SetTouched	combined tag for changing values from midi controller
+	REC_MIDIController	REC_Control | REC_FromMIDI	combined tag for changing values from midi controller (when value needs to be translated)
+
+Step parameters
+	Parameter	Value	Documentation
+	pPitch	0	update the value
+	pVelocity	1	retrieves the value
+	pRelease	2	updates the hint (if any)
+	pFinePitch	3	updates the label for the plugin param
+	pPan	4	updates the wheel/knob
+	pModX	5	Per step Mod X value
+	pModY	6	Per step Mod Y value
+	pShift	7	set the changed flag
+Global transport commnads
+	Parameter	Value	Documentation
+	FPT_Jog	0	(jog) generic jog (can be used to select stuff)
+	FPT_Jog2	1	(jog) alternate generic jog (can be used to relocate stuff)
+	FPT_Strip	2	touch-sensitive jog strip, value will be in -midi.FromMIDI_Max..midi.FromMIDI_Max for leftmost..rightmost
+	FPT_StripJog	3	(jog) touch-sensitive jog in jog mode
+	FPT_StripHold	4	value will be 0 for release, 1,2 for 1,2 fingers centered mode, -1,-2 for 1,2 fingers jog mode (will then send FPT_StripJog)
+	FPT_Previous	5	(button)
+	FPT_Next	6	(button)
+	FPT_PreviousNext	7	(jog) generic track selection
+	FPT_MoveJog	8	(jog) used to relocate items
+	FPT_Play	10	(button) play/pause
+	FPT_Stop	11	(button)
+	FPT_Record	12	(button)
+	FPT_Rewind	13	(hold) perform rewind, set value to SS_Start to start, set to SS_Stop to stop
+	FPT_FastForward	14	(hold) perform move forward, set value to SS_Start to start, set to SS_Stop to stop
+	FPT_Loop	15	(button)
+	FPT_Mute	16	(button)
+	FPT_Mode	17	(button) generic | record mode
+	FPT_Undo	20	(button) undo/redo last, | undo down in history
+	FPT_UndoUp	21	(button) undo up in history (no need to implement if no undo history)
+	FPT_UndoJog	22	(jog) undo in history (no need to implement if no undo history)
+	FPT_Punch	30	(hold) live selection
+	FPT_PunchIn	31	(button)
+	FPT_PunchOut	32	(button)
+	FPT_AddMarker	33	(button)
+	FPT_AddAltMarker	34	(button) add alternate marker
+	FPT_MarkerJumpJog	35	(jog) marker jump
+	FPT_MarkerSelJog	36	(jog) marker selection
+	FPT_Up	40	(button)
+	FPT_Down	41	(button)
+	FPT_Left	42	(button)
+	FPT_Right	43	(button)
+	FPT_HZoomJog	44	(jog) change horizontal zoom in active window (playlist/piano roll) or increase/decrease font size (browser)
+	FPT_VZoomJog	45	(jog) change vertical zoom in active window (playlist/piano roll) or increase/decrease font size (browser)
+	FPT_Snap	48	(button) snap on/off
+	FPT_SnapMode	49	(jog) snap mode
+	FPT_Cut	50	(button)
+	FPT_Copy	51	(button)
+	FPT_Paste	52	(button)
+	FPT_Insert	53	(button)
+	FPT_Delete	54	(button)
+	FPT_NextWindow	58	(button) TAB
+	FPT_WindowJog	59	(jog) window selection
+	FPT_F1	60	(button)
+	FPT_F2	61	(button) Rename selected mixer track
+	FPT_F3	62	(button)
+	FPT_F4	63	(button) Next empty pattern with naming dialog
+	FPT_F5	64	(button) Toggle Playlist
+	FPT_F6	65	(button) Toggle Step Sequencer
+	FPT_F7	66	(button) Toggle Piano roll
+	FPT_F8	67	(button) Open Plugin Picker
+	FPT_F9	68	(button) Show/hide Mixer
+	FPT_F10	69	(button) Show/hide MIDI settings
+	FPT_F11	70	(button) Show/hide song info window
+	FPT_F12	71	(button) Executes the close all windows menu item
+	FPT_Enter	80	(button) enter/accept
+	FPT_Escape	81	(button) escape/cancel
+	FPT_Yes	82	(button) yes
+	FPT_No	83	(button) no
+	FPT_Menu	90	(button) generic menu
+	FPT_ItemMenu	91	(button) item edit/tool/contextual menu
+	FPT_Save	92	(button)
+	FPT_SaveNew	93	(button) save as new version
+	FPT_PatternJog	100	(jog) pattern
+	FPT_TrackJog	101	(jog) mixerr track
+	FPT_ChannelJog	102	(jog) channel
+	FPT_TempoJog	105	(jog) tempo (in 0.1BPM increments)
+	FPT_TapTempo	106	(button) tempo tapping
+	FPT_NudgeMinus	107	(hold) tempo nudge -
+	FPT_NudgePlus	108	(hold) tempo nudge +
+	FPT_Metronome	110	(button) metronome
+	FPT_WaitForInput	111	(button) wait for input to start playing
+	FPT_Overdub	112	(button) overdub recording
+	FPT_LoopRecord	113	(button) loop recording
+	FPT_StepEdit	114	(button) step edit mode
+	FPT_CountDown	115	(button) countdown before recording
+	FPT_NextMixerWindow	120	(button) tabs between plugin windows in the current mixer track
+	FPT_MixerWindowJog	121	(jog) mixer window selection
+	FPT_ShuffleJog	122	main shuffle (in increments of 1)
+
+Global transport flags
+	Parameter	Value	Documentation
+	GT_Cannot	-1	not handled
+	GT_None	0	none
+	GT_Plugin	1	(handled by) Focused plugin
+	GT_Form	2	(handled by) Focused form
+	GT_Menu	4	(handled by) Menu
+	GT_Global	8	(handled) Globally
+	GT_All	15	All
+	GT_Delayed	5	Delayed handling (return value only)
+
+StartStop options
+	Parameter	Value	Documentation
+	SS_Stop	0	Stop movement
+	SS_StartStep	1	Start movement, but only when FL Studio is in step editing mode.
+	SS_Start	2	Start movement.
+	Song length mode
+	Parameter	Value	Documentation
+	SONGLENGTH_MS	0	Length in ms
+	SONGLENGTH_S	1	Length in s.
+	SONGLENGTH_ABSTICKS	2	Length in absolute ticks
+	SONGLENGTH_BARS	3	Length in BST format (bars part), not implemented in setSongPos
+	SONGLENGTH_STEPS	4	Length in BST format (steps part), not implemented in setSongPos
+	SONGLENGTH_TICKS	5	Length in BST format (ticks part), not implemented in setSongPos
+
+PME flags
+	Parameter	Value	Documentation
+	PME_System	2	Can do system stuff (play/pause.. mostly safe things)
+	PME_System_Safe	4	Can do critical system stuff (add markers.. things that can't be done when a modal window is shown)
+	PME_PreviewNote	8	note trigger previews notes | controls stuff
+	PME_FromHost	16	when the app is hosted
+	PME_FromMIDI	32	coming from MIDI event
+
+Current track flags
+	Parameter	Value	Documentation
+	curfxScrollToMakeVisible	1	Scroll to visible track
+	curfxCancelSmoothing	2	Cancel smooting
+	curfxNoDeselectAll	4	[todo] needs explanation
+	curfxMinimalLatencyUpdate	8	[todo] needs explanation
+
+Track info mode
+	Parameter	Value	Documentation
+	TN_Master	0	Master
+	TN_FirstIns	1	First insert
+	TN_LastIns	2	Last insert
+	TN_Sel	3	Selected
+
+IsIncrement flags
+	Parameter	Value	Documentation
+	II_Absolute	0	Absolute
+	II_Increment	1	Increement
+	II_Switch	2	Switch
+
+Open event editor modes
+	Parameter	Value	Documentation
+	EE_EE	0	Controller editor
+	EE_PR	1	Piano Roll
+	EE_PL	2	Playlist
+
+Track peaks mode
+	Parameter	Value	Documentation
+	PEAK_L	0	Current peak for the left channel
+	PEAK_R	1	Current peak for the right channel
+	PEAK_LR	2	Current maximum peak of the peaks from left and right channel
+	PEAK_L_INV	0	Current peak for the left channel (inverted)
+	PEAK_R_INV	1	Current peak for the right channel (inverted)
+	PEAK_LR_INV	3	Current maximum peak of the peaks from left and right channel (inverted)
+
+Song tick modes
+	Parameter	Value	Documentation
+	ST_Int	0	(TODO: needs explanation)
+	ST_Beat	1	Beat
+	ST_PGB	2	(TODO: needs explanation)
+
+Pickup Follow modes
+	Parameter	Value	Documentation
+	PIM_None	0	do not use pickup
+	PIM_AlwaysPickup	1	always use pickup
+	PIM_FollowGlobal	2	follow FL Studio global pickup setting
+
+Get linked info result flags
+	Parameter	Value	Documentation
+	Event_CantInterpolate	1	(TODO: needs explanation)
+	Event_Float	2	(TODO: needs explanation)
+	Event_Centered	4	(TODO: needs explanation)
+
+Find empty paths flags
+	Parameter	Value	Documentation
+	FFNEP_FindFirst	0	Find first pattern
+	FFNEP_DontPromptName	1	Don't prompt pattern name
+
+Get Color flags
+	Parameter	Value	Documentation
+	GC_BackgroundColor	0	Retrieves the darkest background color of the GUI
+	GC_Semitone	1	Retrieves semitone color (Currently implemented in FPC to get pads color)
+
+GetPadName parameter options
+	Parameter	Value	Documentation
+	PAD_Count	0	Retrieve number of pad parameters supported by plugin
+	PAD_Semitone	1	Retrieve semitone for pad specified by padIndex
+	PAD_Color	2	Retrieve color for pad specified by padIndex
+
+Get Name flags (not all parameters works in all plugins)
+	Parameter	Value	Documentation
+	FPN_Param	0	Retrieve name of plugin parameter (defined by paramIndex)
+	FPN_ParamValue	1	Retrieve text value of plugin parameter (defined by paramIndex)
+	FPN_Semitone	2	Retrieve name of note defined by plugin (by paramIndex)
+	FPN_Patch	3	Retrieve name of patch defined by plugin (by paramIndex)
+	FPN_VoiceLevel	4	Retrieve name of per-voice parameter defined by plugin (by paramIndex)
+	FPN_VoiceLevelHint	5	Retrieve (longer) name of per-voice parameter defined by plugin (by paramIndex)
+	FPN_Preset	6	For plugins that support internal presets (mainly for the wrapper plugin), retrieve the name for preset at paramIndex
+	leave paramIndex parameter empty or use midi.GPN_GetCurrentPreset to get current preset name
+	FPN_OutCtrl	7	for plugins that output controllers, retrieve the name of output controller paramIndex
+	FPN_VoiceColor	8	retrieve name of per-voice color (MIDI channel) (by paramIndex)
+	FPN_OutVoice	9	for plugins that output voices, retrieve the name of output voice (by paramIndex)
+
+Save undo flags
+	Parameter	Value	Documentation
+	UF_None	0	
+	UF_EE	1	Event editor
+	UF_PR	2	Piano roll
+	UF_PL	4	Playlist
+	UF_EEPR	3	Event editor + piano roll
+	UF_KNOB	32	Automated control
+	UF_AudioRec	256	Audio recording
+	UF_AutoClip	512	Automation clip
+	UF_PRMarker	1024	Pattern marker
+	UF_PLMarker	2048	Playlist marker
+	UF_Plugin	4096	Plugin
+	UF_SSLooping	8192	Step Sequencer looping
+	UF_Reset	65536	Reset undo history
+
+FL window constants
+	Parameter	Value	Documentation
+	widMixer	0	Mixer
+	widChannelRack	1	Channel rack
+	widPlaylist	2	Playlist
+	widPianoRoll	3	Piano roll
+	widBrowser	4	Browser
+	widPlugin	5	Plugin window (only available inside getFocused function)
+	widPluginEffect	6	Effect Plugin window (only available inside getFocused/setFocused/getFocusedFormID functions)
+	widPluginGenerator	7	Generator Plugin window (only available inside getFocused/setFocused/getFocusedFormID functions)

@@ -5,16 +5,20 @@ from data import Button, Fader, Knob
 
 class Led:
 
-	def __init__(self):
+	def __init__(self, modes):
 		self.window_leds = [Button.aux1, Button.main, Button.aux2, Button.aux3, Button.comp]
 		self.track_leds = Button.numbers
 		self.fader_leds = [Fader.one, Fader.two, Fader.three, Fader.four, Fader.five, Fader.six, Fader.seven, Fader.eight]
+		self.modes = modes
 
-	def update(self):
-
+	def update(self, focused):
 		self.light_window()
-		self.light_track(Get.current_track())
-		self.light_levels()
+		self.light_track(Get.current_track() - (self.modes[1].iter * 8))
+		# self.light_levels()
+		self.light_pan(self.track_or_channel(), Get.focused_window())
+
+		if Get.focused_window() == 1:
+			self.light_channel_volume(Get.current_channel())
 
 		if Get.is_playing():
 			Send.midi_msg(144, 0, Button.stop, 0)
@@ -28,11 +32,17 @@ class Led:
 		else:
 			Send.midi_msg(144, 0, Button.record, 0)
 
-		if Modes.get_mode_option('master'):
+		if self.modes[0].get_current_mode_name() == 'Master':
+			Send.midi_msg(144, 0, Button.master, 1)
+		else:
 			Send.midi_msg(144, 0, Button.master, 0)
 
+		if Get.metronome_status():
+			Send.midi_msg(144, 0, Button.gate, 1)
 		else:
-			Send.midi_msg(144, 0, Button.master, 1)
+			Send.midi_msg(144, 0, Button.gate, 0)
+
+		self.light_mode()
 
 	def reset(self):
 		Send.midi_msg(144, 0, Button.master, 1)
@@ -56,7 +66,7 @@ class Led:
 	def light_levels(self):
 
 		for fader in self.fader_leds:
-			vol = Get.track_volume(self.fader_leds.index(fader), 1)
+			vol = Get.track_volume(self.fader_leds.index(fader)  + (self.modes[1].iter * 8), 1)
 
 			if 0 > vol < -40:
 				Send.midi_msg(176, 0, fader - 1, 0) 
@@ -65,5 +75,30 @@ class Led:
 			else:
 				Send.midi_msg(176, 0, fader - 1, int(mapvalues(vol, 96, 127, 0, 5.6)))
 
-	
+	def light_mode(self):
+
+		if self.modes[1].iter == 0:
+			Send.midi_msg(176, 0, Knob.kfour, 0)
+		elif self.modes[1].iter == 1:
+			Send.midi_msg(176, 0, Knob.kfour, 37)
+		elif self.modes[1].iter == 2:
+			Send.midi_msg(176, 0, Knob.kfour, 98)
+		elif self.modes[1].iter == 3:
+			Send.midi_msg(176, 0, Knob.kfour, 127)
+
+	def light_pan(self, track, focused):
+		if focused == 0:
+			Send.midi_msg(176, 0, Knob.ktwo, int(mapvalues(Get.track_panning(track), 0, 127, -1, 1)))
+		elif focused == 1:
+			Send.midi_msg(176, 0, Knob.ktwo, int(mapvalues(Get.channel_panning(track), 0, 127, -1, 1)))
+
+	def track_or_channel(self):
+		if Get.focused_window() == 0:
+			return Get.current_track() + (self.modes[1].iter * 8)
+
+		elif Get.focused_window() == 1:
+			return Get.current_channel()
+
+	def light_channel_volume(self, channel):
+		Send.midi_msg(176, 0, Knob.kone, int(Get.channel_volume(channel) * 127))
 

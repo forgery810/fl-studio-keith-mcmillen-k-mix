@@ -2,6 +2,7 @@ import transport
 import mixer
 import ui 
 import channels
+import midi
 
 class TrAct:
 
@@ -16,6 +17,18 @@ class TrAct:
 
 	def record():
 		transport.record()
+
+	def loop():
+		transport.setLoopMode()
+
+	def overdub():
+		transport.globalTransport(midi.FPT_Overdub, 112)
+
+	def metronome():
+		transport.globalTransport(midi.FPT_Metronome, 110)
+
+	def loop_record():
+		transport.globalTransport(midi.FPT_LoopRecord, 113)
 
 class MixAct:
 

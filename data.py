@@ -1,8 +1,6 @@
 
 class Button:				#144 / 128
 
-
-
 	master = 9
 	preset = 13
 	record = 26
@@ -19,7 +17,7 @@ class Button:				#144 / 128
 	aux3 = 17
 	comp = 18
 	gate = 19
-	pan = 2 
+	pan = 20 
 	eq  = 21
 	verb = 22
 	trim = 23

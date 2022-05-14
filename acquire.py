@@ -39,6 +39,9 @@ class Get:
 	def current_channel():
 		return channels.channelNumber()
 
+	def channel_volume(chan):
+		return channels.getChannelVolume(chan)
+
 	def focused_window():
 		return ui.getFocusedFormID()
 
@@ -47,4 +50,19 @@ class Get:
 		for step in range(0, Get.pattern_length(pattern)):
 			trigs.append(Get.trig_bit(pattern, step))
 		print(trigs)
+
+	def track_panning(track):
+		return mixer.getTrackPan(track)
+
+	def channel_panning(track):
+		return channels.getChannelPan(track)
+
+	def loop_mode():
+		return transport.getLoopMode()
+
+	def metronome_status():
+		return ui.isMetronomeEnabled()
+
+	
+
 
