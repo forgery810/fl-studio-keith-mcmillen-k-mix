@@ -7,23 +7,41 @@
 
 Update to the latest version of FL Studio.
 
-Clone and Unzip the folder to Documents/Image-Line/Fl Studio/Settings/Hardware
+Clone and Unzip the folder to Documents/Image-Line/Fl Studio/Settings/Hardware.
 
- In Fl Studio, go to options/MIDI settings and enable Control Surface under Input and Output and set the Ports of each to 3. Disable Audio Control and Expander. Set Contoller Type to Keith McMillen K-Mix found in the upper right corner of the window. 
+In Fl Studio, go to options/MIDI settings and enable Control Surface under Input and Output.
 
-# Manual
+Set the Ports of each to 3. 
+
+Disable Audio Control and Expander. 
+
+Set Contoller Type to Keith McMillen K-Mix found in the upper right corner of the window. 
+
+# Layout
+
+![k-mix-resized](https://user-images.githubusercontent.com/76767272/170359646-f2f46c84-eeef-4b87-a44f-232f86549dc6.png)
+
+![kmix-a-z-resized](https://user-images.githubusercontent.com/76767272/170359680-4965f9dc-19ec-4f7a-809d-a1e348f5d82a.png)
+
 
 Record, play, and stop buttons work as expected.
 
 Other button functionality:
 
 A - Opens Channel Rack
+
 B - Opens Mixer
+
 C - Opens Piano Roll
+
 D - Opens Playlist
+
 E - Opens Broswer
+
 F - Metronome
+
 G - Overdub
+
 H - Loop
 
 Fine - Up
@@ -35,9 +53,11 @@ Master Button - Alternates between options for master fader
 
 Master Fader - Controls master track volume (red LED lit) or 
                Scrolls through channels
+               
 1-8 Faders - Control mixer track volume for tracks 1-8
 
 Knob One - Controls volume for selected track or channel
+
 Knob Two - Controls panning for selected track or channel
 
 Knob Four - Selects range for faders. Four ranges to access
