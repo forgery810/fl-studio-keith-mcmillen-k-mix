@@ -22,23 +22,25 @@ access = Modes('Access', ['1-8', '9-16', '17-24', '25-32'])
 lights = Led([master, access])
 
 def OnInit():
+
 	print(f'Keith McMillen - K-Mix Version: {VERSION}')
 	lights.reset()
-	lights.update(Get.focused_window())
+	lights.update(Get.focused_window(), master.iter)
 
 def OnMidiMsg(event):
 
 	print(event.midiId, event.data1, event.data2, event.midiChan)
 	km = KM(event)
-	lights.update(Get.focused_window())
+	lights.update(Get.focused_window(), master.iter)
 
 def OnRefresh(flag):
-	print(flag)
 
 	if flag == 263:
 		access.update_iter(Get.current_track())
+
 	if flag:
-		lights.update(Get.focused_window())	
+		lights.update(Get.focused_window(), master.iter)	
+
 def OnIdle():
 	pass
 
@@ -50,7 +52,7 @@ class KM:
 		self.track = Get.current_track()
 		self.event = event
 		self.decide()
-		lights.update(Get.focused_window())
+		lights.update(Get.focused_window(), master.iter)
 
 	def decide(self):
 
@@ -102,7 +104,6 @@ class KM:
 			UIAct.down()
 
 		elif self.event.data1 == Button.master:
-			# mode.change_mode('master')
 			master.iterate()
 
 		elif self.event.data1 == Button.gate:
@@ -134,7 +135,7 @@ class KM:
 					channels.selectOneChannel(int(round(mapvalues(self.event.data2, channels.channelCount()-1, 0, 0, 127), 0)))	
 				self.handled = True	
 			else:					
-				MixAct.track_volume(0, self.event.data2/127)
+				MixAct.track_volume(0, self.event.data2/127, 0)
 				self.event.handled = True
 
 		if Get.mixer_focused() and self.event.data1 != Fader.master:
@@ -160,7 +161,6 @@ class KM:
 
 			elif self.event.data1 == Knob.kfour:
 				access.set_range(self.event.data2)
-				print(access.iter)
 
 		self.event.handled = True
 

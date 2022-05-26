@@ -3,10 +3,6 @@ from data import *
 from utilities import Send
 from acquire import Get
 
-# class Modes():
-
-
-
 class Modes:
 
 	def __init__(self, name, categories):
@@ -14,7 +10,6 @@ class Modes:
 		self.iter = 0
 		self.categories = categories
 		self.ranges = [range(1, 9), range(9, 17), range(17, 25), range(25, 33) ]
-	
 
 	def iterate(self):
 		self.iter += 1
@@ -38,11 +33,10 @@ class Modes:
 			self.iter = 3
 
 	def update_iter(self, num):
-		print(Get.current_track())
+
 		for r in self.ranges:
 			if num in r:
 				self.iter = self.ranges.index(r)
-				print(r)
 
 
 
