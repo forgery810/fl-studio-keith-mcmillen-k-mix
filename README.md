@@ -17,6 +17,9 @@ Disable Audio Control and Expander.
 
 Set Contoller Type to Keith McMillen K-Mix found in the upper right corner of the window. 
 
+Press Shift and 1 (Record Button) to put the K-Mix in MIDI controller mode. This (should) be set to work with the default K-Mix MIDI assignments.
+If not, please let me know of it or any other bugs you encounter.
+
 # Layout
 
 ![k-mix-resized](https://user-images.githubusercontent.com/76767272/170359646-f2f46c84-eeef-4b87-a44f-232f86549dc6.png)
